@@ -18,7 +18,11 @@ Before starting the server, copy `.env.example` to `.env` and set `GROQ_API_KEY`
 - **Inferential** requires an assumption. A parking-lot encounter would challenge the stay-at-home claim if the lot was elsewhere.
 - **False positive** covers compatible accounts. Driving through an area is consistent with never entering a particular warehouse. These findings appear alongside the other categories and are excluded from the contradiction count.
 
-Groq proposes a relationship and cites lines. The app verifies the citations and calculates confidence locally. The rubric starts at 90 for direct, 68 for inferential, and 12 for compatible accounts. Qualified wording subtracts 10 per answer in a potential conflict. A narrow rounding rule scores otherwise matching statements at 4 when one time is approximate, the times are within ten minutes, and the question context matches. These scores are review heuristics.
+Groq extracts structured claims with exact answer quotes and line references. It also suggests links between answers about the same proposition, including paraphrased questions. The app scores these findings locally. The app validates the payload, checks quotes against the submitted answers, and checks extracted context against the answer or its question. The input contract is two transcripts from the same witness.
+
+Local rules cover explicit opposition, prior awareness, staying home versus leaving, continuous wakefulness, approximate times, and location scope. The parking-lot encounter can support an inference about leaving home. Its score reflects the uncertainty about location, timing, and what the neighbor saw.
+
+Every displayed relationship receives a heuristic evidence-strength score. Scores of 70–100 are direct contradictions, 35–69 are inferential contradictions, and 0–34 are false positives. The default starting scores in [claims.js](claims.js) are 90 for explicit opposition, 65 for an inference, and 8 for compatible accounts. Applicable deductions cover qualifiers, assumptions, and reliance on a model suggestion. The same validated claims and links produce the same scores. Groq can return different suggestions between runs.
 
 ## Verify
 

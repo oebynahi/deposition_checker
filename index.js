@@ -40,12 +40,12 @@ export default function DepositionChecker() {
 
   function card(result, i) {
     return <article key={i}><div className="cardTitle"><strong className={'chip ' + result.type}>{labels[result.type]}</strong>
-      <span>Contradiction confidence <b>{result.confidence}/100</b></span></div>
+      <span>Contradiction evidence <b>{result.confidence}/100</b></span></div>
       <p>{result.reason}</p>
       <div className="pair">{result.evidence.map(({line, text}, j) => <div key={j}>
         <button className="citation" onClick={() => reveal(j, line)}>Transcript {j + 1} · Line {line}</button>
         <blockquote>{text}</blockquote></div>)}</div>
-      <details><summary>How the score was calculated</summary><ul>{result.factors.map(factor => <li key={factor}>{factor}</li>)}</ul></details>
+      <details><summary>Scoring details</summary><ul>{result.factors.map(factor => <li key={factor}>{factor}</li>)}</ul></details>
     </article>;
   }
 
@@ -60,8 +60,9 @@ export default function DepositionChecker() {
       <small>Comparison sends both transcripts to Groq.</small></div></form>
     {error && <p role="alert">{error}</p>}
     <section aria-live="polite">{results && <>
-      <h2>Review findings · Groq</h2>
-      <p>{results.filter(r => r.type !== "FALSE_POSITIVE").length} potential contradictions · {results.filter(r => r.type === "FALSE_POSITIVE").length} false positives</p>
+      <h2>Review findings</h2>
+      <p>{results.filter(r => ["DIRECT", "INFERENTIAL"].includes(r.type)).length} potential contradictions · {results.filter(r => r.type === "FALSE_POSITIVE").length} false positives</p>
+      <small>Scores estimate evidence strength on a heuristic scale.</small>
       {results.length === 0 && <p>No apparent discrepancies found in this comparison.</p>}
       {results.map(card)}
     </>}</section></main>;
