@@ -1,5 +1,3 @@
-import { evidenceLines, findings } from "./analysis.js";
-
 // Two depositions from the same witness, 6 months apart
 const TRANSCRIPT_1 = `
 Deposition of Marcus Webb — March 14, 2023
@@ -46,14 +44,3 @@ A: I knew of him. We had mutual friends. I don't think I'd met him face to face.
 `;
 
 export const sampleTranscripts = [TRANSCRIPT_1.trim(), TRANSCRIPT_2.trim()];
-
-export function sampleFindings() {
-  return findings([
-    { line1: 4, line2: 4, relation: "explicit_opposition",
-      reason: "Webb first says he stayed home all evening. His later recollection of leaving for groceries directly challenges that claim." },
-    { line1: 4, line2: 10, relation: "incompatible_implications",
-      reason: "A wave in a parking lot would place Webb away from home if the lot was elsewhere. The testimony leaves the location open, and Webb is unsure the encounter occurred." },
-    { line1: 13, line2: 16, relation: "compatible_accounts",
-      reason: "Driving through the neighborhood is compatible with never visiting the warehouse. The questions refer to different places." }
-  ], sampleTranscripts.map(evidenceLines));
-}

@@ -24,6 +24,5 @@ article { padding: 20px; margin: 14px 0; background: #fffefa; border: 1px solid 
 blockquote { margin: 4px 0 16px; border-left: 2px solid #b9c5bb; padding-left: 10px; overflow-wrap: anywhere; }
 .citation { border: 0; background: none; padding: 3px 0; text-decoration: underline; color: #23594f; }
 details { font-size: .92rem; }
-.excluded { margin-top: 16px; }
 [role=alert] { color: #912c21; }
 @media(max-width: 680px) { main { padding: 28px 16px; } .pair { grid-template-columns: 1fr; } textarea { height: 200px; } }

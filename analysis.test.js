@@ -50,8 +50,11 @@ const provider = async () => Response.json({
   choices: [{ finish_reason: "stop", message: { content: JSON.stringify({ candidates: [item] }) } }]
 });
 test("HTTP entry point validates requests and returns source-grounded analysis", async t => {
-  const server = app({ apiKey: "test", fetchImpl: provider });
-  await new Promise((resolve, reject) => server.once("error", reject).listen(0, "127.0.0.1", resolve));
+  const server = await new Promise((resolve, reject) => {
+    const listener = app({ apiKey: "test", fetchImpl: provider }).listen(0, "127.0.0.1");
+    listener.once("listening", () => resolve(listener));
+    listener.once("error", reject);
+  });
   t.after(() => new Promise(resolve => server.close(resolve)));
   const url = 'http://127.0.0.1:' + server.address().port + '/api/analyze';
   const post = transcripts => fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ transcripts }) });
@@ -59,15 +62,6 @@ test("HTTP entry point validates requests and returns source-grounded analysis",
   assert.equal(res.status, 200);
   assert.deepEqual((await res.json()).findings, [compare(pair)]);
   assert.equal((await post(["", " "])).status, 400);
-});
-
-test("key-free sample covers all three categories with citations to the prefilled testimony", async () => {
-  const { sampleFindings } = await import("./sample.js");
-  const rows = sampleFindings();
-  assert.deepEqual(rows.map(row => row.type), ["DIRECT", "INFERENTIAL", "FALSE_POSITIVE"]);
-  assert.match(rows[0].evidence[1].text, /groceries/);
-  assert.match(rows[1].evidence[1].text, /parking lot/);
-  assert.match(rows[2].evidence[1].text, /driven through/);
 });
 
 test("Groq requests structured output and applies the same local scoring and citation checks", async () => {

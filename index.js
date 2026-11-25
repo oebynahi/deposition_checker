@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import "./style.css";
 import React, { useState, useRef } from "react";
 
-import { sampleTranscripts, sampleFindings } from "./sample.js";
+import { sampleTranscripts } from "./transcripts.js";
 
 const labels = { DIRECT: "Direct contradiction", INFERENTIAL: "Inferential contradiction", FALSE_POSITIVE: "False positive" };
 
@@ -11,13 +11,10 @@ export default function DepositionChecker() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState("");
-  const [source, setSource] = useState("");
-  const originalPair = transcripts.every((value, i) => value === sampleTranscripts[i]);
   const editors = useRef([]);
 
   async function analyze(event) {
     event.preventDefault();
-    setSource("");
     setLoading(true);
     setResults(null);
     setError("");
@@ -28,7 +25,6 @@ export default function DepositionChecker() {
       });
       const data = await res.json();
       if (!res.ok) throw Error(data.error || "Analysis failed. Try again.");
-      setSource("Groq");
       setResults(data.findings);
     } catch (err) { setError(err.message); }
     finally { setLoading(false); }
@@ -60,18 +56,14 @@ export default function DepositionChecker() {
           setResults(null); setError("");
           setTranscripts(transcripts.map((old, j) => i === j ? event.target.value : old));
         }}/></label>)}</div>
-      <div className="actions"><button type="button" disabled={loading || !originalPair} onClick={() => {
-        setError(""); setSource("Sample"); setResults(sampleFindings());
-      }}>Run sample review</button><button disabled={loading || transcripts.some(t => !t.trim())}>{loading ? "Comparing testimony…" : "Compare transcripts"}</button>
-      <small>Sample review uses prepared examples from the original Webb transcripts. Live comparison sends the inputs to Groq.</small></div></form>
+      <div className="actions"><button disabled={loading || transcripts.some(t => !t.trim())}>{loading ? "Comparing testimony…" : "Compare transcripts"}</button>
+      <small>Comparison sends both transcripts to Groq.</small></div></form>
     {error && <p role="alert">{error}</p>}
     <section aria-live="polite">{results && <>
-      <h2>{source === "Sample" ? "Sample findings" : `Review findings · ${source}`}</h2>
+      <h2>Review findings · Groq</h2>
       <p>{results.filter(r => r.type !== "FALSE_POSITIVE").length} potential contradictions · {results.filter(r => r.type === "FALSE_POSITIVE").length} false positives</p>
       {results.length === 0 && <p>No apparent discrepancies found in this comparison.</p>}
-      {results.filter(r => r.type !== "FALSE_POSITIVE").map(card)}
-      {results.some(r => r.type === "FALSE_POSITIVE") && <details className="excluded"><summary>Review false positives</summary>
-      {results.filter(r => r.type === "FALSE_POSITIVE").map(card)}</details>}
+      {results.map(card)}
     </>}</section></main>;
 }
 
