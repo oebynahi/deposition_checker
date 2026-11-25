@@ -1,0 +1,21 @@
+{
+  "name": "deposition-checker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.9.0"
+  },
+  "scripts": {
+    "build": "esbuild index.js --bundle --minify --outfile=dist/app.js --loader:.js=jsx",
+    "start": "npm run build && node --env-file-if-exists=.env server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
